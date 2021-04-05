@@ -1,9 +1,12 @@
 package tech.anshul1507.multiple_permissions_android
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +37,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAndRequestPermissions(): Boolean{
+        // Check which permissions are not granted
+        val listOfPermissionsNeeded = arrayListOf<String>()
+        for(permission in permissions){
+            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+                listOfPermissionsNeeded.add(permission)
+            }
+        }
+
+        //Ask for non-granted permissions
+        if(listOfPermissionsNeeded.isNotEmpty()){
+            ActivityCompat.requestPermissions(
+                    this,
+                    listOfPermissionsNeeded.toTypedArray(),
+                    PERMISSION_REQ_CODE
+            )
+            return false
+        }
+
+        // App has all granted permissions
         return true
     }
 
