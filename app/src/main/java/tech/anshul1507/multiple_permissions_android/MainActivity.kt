@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -20,7 +21,8 @@ class MainActivity : AppCompatActivity() {
     // List of all permissions
     private var permissions = arrayListOf(
         Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
     private val listOfPermissionsDenied = arrayListOf<String>()
@@ -28,13 +30,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            //for android >= 11
-            permissions.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-        } else {
-            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
 
         // Check for app permissions
         if (checkAndRequestPermissions()) {
@@ -75,9 +70,15 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         if (requestCode == PERMISSION_REQ_CODE) {
-
             // Check there are no denied permissions left
-            if (listOfPermissionsDenied.isEmpty()) {
+            val listOfPermissionsLeft = arrayListOf<String>()
+            for (i in grantResults.indices) {
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    listOfPermissionsLeft.add(permissions[i])
+                }
+            }
+
+            if (listOfPermissionsLeft.isEmpty()) {
                 initApp()
             } else {
                 /** If permissions are denied
@@ -85,10 +86,11 @@ class MainActivity : AppCompatActivity() {
                  * 2 -> We have only setting option left which is user manual step
                  */
 
-                for (permission in listOfPermissionsDenied) {
+                for (permission in listOfPermissionsLeft) {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
                         // Case 1
-                        showAlertDialog("",
+                        showAlertDialog(
+                            "",
                             "This app needs some permissions to run smoothly",
                             "Accept Permissions",
                             { dialog, _ ->
@@ -130,7 +132,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private fun showAlertDialog(
