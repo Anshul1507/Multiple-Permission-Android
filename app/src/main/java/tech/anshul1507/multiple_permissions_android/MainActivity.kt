@@ -13,10 +13,12 @@ class MainActivity : AppCompatActivity() {
     private var PERMISSION_REQ_CODE = 100
 
     // List of all permissions
-    var permissions = arrayListOf(
+    private var permissions = arrayListOf(
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.ACCESS_FINE_LOCATION
     )
+
+    private val listOfPermissionsDenied = arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,26 +32,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Check for app permissions
-        if(checkAndRequestPermissions()){
+        if (checkAndRequestPermissions()) {
             initApp()
         }
 
     }
 
-    private fun checkAndRequestPermissions(): Boolean{
+    private fun checkAndRequestPermissions(): Boolean {
         // Check which permissions are not granted
-        val listOfPermissionsNeeded = arrayListOf<String>()
-        for(permission in permissions){
-            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
-                listOfPermissionsNeeded.add(permission)
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
+                listOfPermissionsDenied.add(permission)
             }
         }
 
         //Ask for non-granted permissions
-        if(listOfPermissionsNeeded.isNotEmpty()){
+        if (listOfPermissionsDenied.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                     this,
-                    listOfPermissionsNeeded.toTypedArray(),
+                    listOfPermissionsDenied.toTypedArray(),
                     PERMISSION_REQ_CODE
             )
             return false
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun initApp(){
+    private fun initApp() {
         // app starts
     }
 }
