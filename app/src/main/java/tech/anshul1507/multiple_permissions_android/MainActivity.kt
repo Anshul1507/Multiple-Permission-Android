@@ -60,6 +60,22 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == PERMISSION_REQ_CODE) {
+
+            // Check there are no denied permissions left
+            if (listOfPermissionsDenied.isEmpty()) {
+                initApp()
+            } else {
+                /** If permissions are denied
+                 * 1 -> We have option to ask permission ask again
+                 * 2 -> We have only setting option left which is user manual step
+                 */
+            }
+        }
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private fun initApp() {
         // app starts
     }
